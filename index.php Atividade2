@@ -1,0 +1,75 @@
+<?php include "database.php"; ?>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Gerenciador de Tarefas</title>
+
+    <!-- JAVASCRIPT SIMPLES -->
+    <script>
+        function confirmarExclusao() {
+            return confirm("Você realmente quer excluir?");
+        }
+    </script>
+
+</head>
+<body>
+
+<h2>Adicionar Nova Tarefa</h2>
+<form action="add_tarefa.php" method="POST">
+    Descrição: <input type="text" name="descricao"><br><br>
+    Data de Vencimento: <input type="date" name="vencimento"><br><br>
+    <button type="submit">Adicionar</button>
+</form>
+
+<hr>
+
+<h2>Tarefas NÃO concluídas</h2>
+
+<?php
+$nao = $conn->query("SELECT * FROM tarefas WHERE concluida = 0 ORDER BY vencimento");
+
+while($t = $nao->fetch_assoc()) {
+    echo "ID: ".$t['id']." | ".
+         "Descrição: ".$t['descricao']." | ".
+         "Vence em: ".$t['vencimento'];
+
+    echo "
+    <form action='update_tarefa.php' method='POST' style='display:inline;'>
+        <input type='hidden' name='id' value='".$t['id']."'>
+        <button type='submit'>Concluir</button>
+    </form>
+
+    <form action='delete_tarefa.php' method='POST' style='display:inline;' onsubmit='return confirmarExclusao()'>
+        <input type='hidden' name='id' value='".$t['id']."'>
+        <button type='submit'>Excluir</button>
+    </form>
+    <br><br>
+    ";
+}
+?>
+
+<hr>
+
+<h2>Tarefas CONCLUÍDAS</h2>
+
+<?php
+$concluidas = $conn->query("SELECT * FROM tarefas WHERE concluida = 1 ORDER BY vencimento");
+
+while($t = $concluidas->fetch_assoc()) {
+    echo "ID: ".$t['id']." | ".
+         "Descrição: ".$t['descricao']." | ".
+         "Vencimento: ".$t['vencimento']." | ✔ Concluída";
+
+    echo "
+    <form action='delete_tarefa.php' method='POST' style='display:inline;' onsubmit='return confirmarExclusao()'>
+        <input type='hidden' name='id' value='".$t['id']."'>
+        <button type='submit'>Excluir</button>
+    </form>
+    <br><br>
+    ";
+}
+?>
+
+</body>
+</html>
